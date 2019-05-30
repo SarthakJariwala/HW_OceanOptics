@@ -10,7 +10,7 @@ class OceanOpticsHW(HardwareComponent):
         # Define your hardware settings here.
         # These settings will be displayed in the GUI and auto-saved with data files
 
-        #this section left blank; it looks like spectrometer elements have to do with measurement 
+        #this section left blank; it looks like spectrometer settings have to do with measurement 
         pass
 
     def connect(self):
