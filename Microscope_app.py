@@ -16,9 +16,9 @@ class OceanOpticsApp(BaseMicroscopeApp):
 		
         #Add Measurement components
         from OceanOptics_measurement import OceanOpticsMeasure
-        from PiezoStage_measurement import PiezoStageMeasure
+        #from PiezoStage_measurement import PiezoStageMeasure
         self.add_measurement(OceanOpticsMeasure(self))
-        self.add_measurement(PiezoStageMeasure(self))
+        #self.add_measurement(PiezoStageMeasure(self))
 		
         # show ui
         self.ui.show()
