@@ -30,6 +30,7 @@ class OceanOpticsMeasure(Measurement):
         # Measurement Specific Settings
         # This setting allows the option to save data to an h5 data file during a run
         # All settings are automatically added to the Microscope user interface
+        self.settings.New('save_h5', dtype=bool, initial=True)
         self.settings.New('scans_to_avg', dtype=int, initial=0)
         self.settings.New('save_every_spec', dtype=bool, initial=False)
         
@@ -38,6 +39,8 @@ class OceanOpticsMeasure(Measurement):
         
         # Define how often to update display during a run
         self.display_update_period = 0.1 
+
+        self.save_array = np.zeros(shape=(2048,2))
         
         # Convenient reference to the hardware used in the measurement
         ##self.func_gen = self.app.hardware['virtual_function_gen']
@@ -51,16 +54,19 @@ class OceanOpticsMeasure(Measurement):
         """
         
         # connect ui widgets to measurement/hardware settings or functions
+
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
         self.ui.saveSingle_pushButton.clicked.connect(self.save_single_spec)
-        
+        self.settings.save_h5.connect_to_widget(self.ui.save_h5_checkBox)
         # Set up pyqtgraph graph_layout in the UI
         self.graph_layout=pg.GraphicsLayoutWidget()
         self.ui.plot_groupBox.layout().addWidget(self.graph_layout)
 
         # # Create PlotItem object (a set of axes)  
         self.plot = self.graph_layout.addPlot(title="Spectrometer Readout Plot")
+        self.plot.setLabel('left', 'Intensity', unit='a.u.')
+        self.plot.setLabel('bottom', 'Wavelength', unit='nm')
         # # Create PlotDataItem object ( a scatter plot on the axes )
         self.optimize_plot_line = self.plot.plot([0])        
 
@@ -92,7 +98,22 @@ class OceanOpticsMeasure(Measurement):
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
-        self.optimize_plot_line.setData(_read_spectrometer) 
+
+        #self.optimize_plot_line.setData(_read_spectrometer) 
+        try:
+            self._read_spectrometer()
+            save_array[:,1] = self.y
+            
+            self.ui.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
+            
+            if self.ui.save_every_spec_checkBox.isChecked():
+                save_array[:,0] = self.spec.wavelengths()
+                np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(j)+".txt", save_array, fmt = '%.5f', 
+                           header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+        
+            #pg.QtGui.QApplication.processEvents()
+        except:
+            pass
     
     def run(self):
         """
@@ -100,8 +121,9 @@ class OceanOpticsMeasure(Measurement):
         It should not update the graphical interface directly, and should only
         focus on data acquisition.
         """
-        # first, create a data file
-        if self.settings['save_every_sepc']:
+        spec = self.app.hardware['oceanoptics']
+         # first, create a data file
+        if self.settings['save_h5']:
             # if enabled will create an HDF5 file with the plotted data
             # first we create an H5 file (by default autosaved to app.settings['save_dir']
             # This stores all the hardware and app meta-data in the H5 file
@@ -129,7 +151,7 @@ class OceanOpticsMeasure(Measurement):
                 self.settings['progress'] = i * 100./len(self.buffer)
                 
                 # Fills the buffer with sine wave readings from func_gen Hardware
-                self.buffer[i] = self.func_gen.settings.sine_data.read_from_hardware()
+                self.buffer[i] = self.spec.read_from_hardware()
                 
                 if self.settings['save_h5']:
                     # if we are saving data to disk, copy data to H5 dataset
