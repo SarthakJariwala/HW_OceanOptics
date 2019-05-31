@@ -9,7 +9,7 @@ class OceanOpticsMeasure(Measurement):
     
     # this is the name of the measurement that ScopeFoundry uses 
     # when displaying your measurement and saving data related to it    
-    name = "sine_wave_plot"
+    name = "spec_plot"
     
     def setup(self):
         """
@@ -54,9 +54,6 @@ class OceanOpticsMeasure(Measurement):
         self.ui.start_pushButton.clicked.connect(self.start)
         self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
         self.ui.saveSingle_pushButton.clicked.connect(self.save_single_spec)
-        #self.settings.scans_to_avg.connect(self.ui.scan_to_avg_spinBox) #an lq
-        #self.settings.save_every_spec.connect_to_widget(self.ui.save_every_spec_checkBox)
-        #self.func_gen.settings.amplitude.connect_to_widget(self.ui.amp_doubleSpinBox)
         
         # Set up pyqtgraph graph_layout in the UI
         self.graph_layout=pg.GraphicsLayoutWidget()
@@ -88,11 +85,6 @@ class OceanOpticsMeasure(Measurement):
                 data = self.spec.spectrum(correct_dark_counts=self.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked()) #SPECSETTING3 #SPECTRUM???
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
-    
-    # else:
-    #     self.ui.status_textBrowser.append("Connect to Spectrometer!")
-    #     raise Exception("Must connect to spectrometer first!")
-
     
     def update_display(self):
         """

@@ -12,6 +12,7 @@ class OceanOpticsHW(HardwareComponent):
         self.name = 'oceanoptics_hardware'
         self.settings.New('intg_time', dtype=int, unit='us', initial=3000, vmin=3000)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
+        print("Hello")
 
     def connect(self):
         # Open connection to the device:
@@ -29,8 +30,7 @@ class OceanOpticsHW(HardwareComponent):
     def disconnect(self):
         #Disconnect the device and remove connections from settings
         self.settings.disconnect_all_from_hardware()
-        if hasAttr(self, spec):
+        if hasattr(self, 'spec'):
             self.spec.close()
             del self.spec
             self.spec = None
-
