@@ -29,7 +29,7 @@ class OceanOpticsHW(HardwareComponent):
     def disconnect(self):
         #Disconnect the device and remove connections from settings
         self.settings.disconnect_all_from_hardware()
-        if self.spec is not None:
+        if hasAttr(self, spec):
             self.spec.close()
             del self.spec
             self.spec = None
