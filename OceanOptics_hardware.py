@@ -12,7 +12,6 @@ class OceanOpticsHW(HardwareComponent):
         self.name = 'oceanoptics'
         self.settings.New('intg_time', dtype=int, unit='us', initial=3000, vmin=3000)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
-        print("Hello")
 
     def connect(self):
         # Open connection to the device:
