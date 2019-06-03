@@ -9,7 +9,7 @@ class OceanOpticsHW(HardwareComponent):
     def setup(self):
         # Define your hardware settings here.
         # These settings will be displayed in the GUI and auto-saved with data files
-        self.name = 'oceanoptics_hardware'
+        self.name = 'oceanoptics'
         self.settings.New('intg_time', dtype=int, unit='us', initial=3000, vmin=3000)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
         print("Hello")
@@ -22,7 +22,6 @@ class OceanOpticsHW(HardwareComponent):
         #Connect settings to hardware:
         self.spec.settings.intg_time.connect_to_hardware(
             self.spec.integration_time_micros)
-
     
         #Take an initial sample of the data.
         self.read_from_hardware()

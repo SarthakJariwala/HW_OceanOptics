@@ -4,6 +4,7 @@ from ScopeFoundry import h5_io
 import pyqtgraph as pg
 import numpy as np
 import time
+import seabreeze.spectrometers as sb
 
 class OceanOpticsMeasure(Measurement):
     
@@ -67,30 +68,9 @@ class OceanOpticsMeasure(Measurement):
         self.plot = self.graph_layout.addPlot(title="Spectrometer Readout Plot")
         self.plot.setLabel('left', 'Intensity', unit='a.u.')
         self.plot.setLabel('bottom', 'Wavelength', unit='nm')
+        
         # # Create PlotDataItem object ( a scatter plot on the axes )
         self.optimize_plot_line = self.plot.plot([0])        
-
-    def save_single_spec(self):
-            save_array = np.zeros(shape=(2048,2))
-            self._read_spectrometer()
-            save_array[:,1] = self.y
-            save_array[:,0] = self.spec.wavelengths()
-
-            np.savetxt(self.settings.save_dir+"/"+self.settings.sample+".txt", save_array, fmt = '%.5f', 
-                       header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
-
-    def _read_spectrometer(self):
-        if hasattr(self, 'spec'):
-            intg_time_ms = self.settings['intg_time']
-            self.spec.integration_time_micros(intg_time_ms*1e3)
-            
-            scans_to_avg = self.settings['scans_to_avg']
-            Int_array = np.zeros(shape=(2048,scans_to_avg))
-            
-            for i in range(scans_to_avg): #software average
-                data = self.spec.spectrum(correct_dark_counts=self.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked()) #SPECSETTING3 #SPECTRUM???
-                Int_array[:,i] = data[1]
-                self.y = np.mean(Int_array, axis=-1)
     
     def update_display(self):
         """
@@ -121,7 +101,7 @@ class OceanOpticsMeasure(Measurement):
         It should not update the graphical interface directly, and should only
         focus on data acquisition.
         """
-        spec = self.app.hardware['oceanoptics']
+        self.spec = self.app.hardware['oceanoptics'].spec
          # first, create a data file
         if self.settings['save_h5']:
             # if enabled will create an HDF5 file with the plotted data
@@ -178,3 +158,25 @@ class OceanOpticsMeasure(Measurement):
             if self.settings['save_h5']:
                 # make sure to close the data file
                 self.h5file.close()
+
+    def save_single_spec(self):
+            save_array = np.zeros(shape=(2048,2))
+            self._read_spectrometer()
+            save_array[:,1] = self.y
+            save_array[:,0] = self.spec.wavelengths()
+
+            np.savetxt(self.settings.save_dir+"/"+self.settings.sample+".txt", save_array, fmt = '%.5f', 
+                       header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+
+    def _read_spectrometer(self):
+        if hasattr(self, 'spec'):
+            intg_time_ms = self.settings['intg_time']
+            self.spec.integration_time_micros(intg_time_ms*1e3)
+            
+            scans_to_avg = self.settings['scans_to_avg']
+            Int_array = np.zeros(shape=(2048,scans_to_avg))
+            
+            for i in range(scans_to_avg): #software average
+                data = self.spec.spectrum(correct_dark_counts=self.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
+                Int_array[:,i] = data[1]
+                self.y = np.mean(Int_array, axis=-1)
