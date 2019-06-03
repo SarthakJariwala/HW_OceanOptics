@@ -42,6 +42,7 @@ class OceanOpticsMeasure(Measurement):
         self.display_update_period = 0.1 
 
         self.save_array = np.zeros(shape=(2048,2))
+        self.point_counter = 0
         
         # Convenient reference to the hardware used in the measurement
         ##self.func_gen = self.app.hardware['virtual_function_gen']
@@ -71,28 +72,7 @@ class OceanOpticsMeasure(Measurement):
         
         # # Create PlotDataItem object ( a scatter plot on the axes )
         self.optimize_plot_line = self.plot.plot([0])        
-    
-    def update_display(self):
-        """
-        Displays (plots) the numpy array self.buffer. 
-        This function runs repeatedly and automatically during the measurement run.
-        its update frequency is defined by self.display_update_period
-        """
 
-        #self.optimize_plot_line.setData(_read_spectrometer) 
-        if hasattr(self, spec):
-            self._read_spectrometer()
-            save_array[:,1] = self.y
-            
-            self.ui.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
-            
-            if self.ui.save_every_spec_checkBox.isChecked():
-                save_array[:,0] = self.spec.wavelengths()
-                np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(j)+".txt", save_array, fmt = '%.5f', 
-                           header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
-        
-            #pg.QtGui.QApplication.processEvents()
-    
     def run(self):
         """
         Runs when measurement is started. Runs in a separate thread from GUI.
@@ -156,6 +136,27 @@ class OceanOpticsMeasure(Measurement):
             if self.settings['save_h5']:
                 # make sure to close the data file
                 self.h5file.close()
+
+    def update_display(self):
+        """
+        Displays (plots) the numpy array self.buffer. 
+        This function runs repeatedly and automatically during the measurement run.
+        its update frequency is defined by self.display_update_period
+        """
+        self.save_array = np.zeros(shape=(2048,2))
+        #self.optimize_plot_line.setData(_read_spectrometer) 
+        if hasattr(self, spec):
+            self._read_spectrometer()
+            save_array[:,1] = self.y
+            
+            self.ui.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
+            
+            if self.ui.save_every_spec_checkBox.isChecked():
+                save_array[:,0] = self.spec.wavelengths()
+                np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(self.point_counter)+".txt", save_array, fmt = '%.5f', 
+                           header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+            self.point_counter += 1
+            pg.QtGui.QApplication.processEvents()
 
     def save_single_spec(self):
             save_array = np.zeros(shape=(2048,2))
