@@ -19,7 +19,7 @@ class OceanOpticsHW(HardwareComponent):
         self.spec = sb.Spectrometer(devices[0])
 
         #Connect settings to hardware:
-        self.spec.settings.intg_time.connect_to_hardware(
+        self.settings.intg_time.connect_to_hardware(
             self.spec.integration_time_micros)
     
         #Take an initial sample of the data.

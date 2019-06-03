@@ -34,12 +34,15 @@ class OceanOpticsMeasure(Measurement):
         self.settings.New('save_h5', dtype=bool, initial=True)
         self.settings.New('scans_to_avg', dtype=int, initial=0)
         self.settings.New('save_every_spec', dtype=bool, initial=False)
+
+        # Define how often to update display during a run
+        self.display_update_period = 0.1 
+        self.settings.New('sampling_period', dtype=int, initial = self.display_update_period)
         
         # Create empty numpy array to serve as a buffer for the acquired data
         self.buffer = np.zeros(120, dtype=float)
         
-        # Define how often to update display during a run
-        self.display_update_period = 0.1 
+
 
         self.save_array = np.zeros(shape=(2048,2))
         self.point_counter = 0
@@ -109,7 +112,7 @@ class OceanOpticsMeasure(Measurement):
                 self.settings['progress'] = i * 100./len(self.buffer)
                 
                 # Fills the buffer with sine wave readings from func_gen Hardware
-                self.buffer[i] = self.spec.read_from_hardware()
+                self.buffer[i] = self.app.hardware['oceanoptics'].read_from_hardware()
                 
                 if self.settings['save_h5']:
                     # if we are saving data to disk, copy data to H5 dataset
@@ -143,16 +146,15 @@ class OceanOpticsMeasure(Measurement):
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
-        self.save_array = np.zeros(shape=(2048,2))
         #self.optimize_plot_line.setData(_read_spectrometer) 
-        if hasattr(self, spec):
+        if hasattr(self, 'spec'):
             self._read_spectrometer()
-            save_array[:,1] = self.y
+            self.save_array[:,1] = self.y
             
             self.ui.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
             
             if self.ui.save_every_spec_checkBox.isChecked():
-                save_array[:,0] = self.spec.wavelengths()
+                self.save_array[:,0] = self.spec.wavelengths()
                 np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(self.point_counter)+".txt", save_array, fmt = '%.5f', 
                            header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
             self.point_counter += 1
