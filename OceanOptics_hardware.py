@@ -21,7 +21,7 @@ class OceanOpticsHW(HardwareComponent):
 
         #Connect settings to hardware:
         self.settings.intg_time.connect_to_hardware(
-            self.spec.integration_time_micros(self.settings['intg_time']))
+            self.spec.integration_time_micros(self.settings['intg_time']*1000))
     
         #Take an initial sample of the data.
         self.read_from_hardware()
