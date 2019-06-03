@@ -155,7 +155,7 @@ class OceanOpticsMeasure(Measurement):
             
             if self.ui.save_every_spec_checkBox.isChecked():
                 self.save_array[:,0] = self.spec.wavelengths()
-                np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(self.point_counter)+".txt", save_array, fmt = '%.5f', 
+                np.savetxt(self.save_folder+"/"+self.ui.lineEdit.text()+str(self.point_counter)+".txt", self.save_array, fmt = '%.5f', 
                            header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
             self.point_counter += 1
             pg.QtGui.QApplication.processEvents()

@@ -12,6 +12,7 @@ class OceanOpticsHW(HardwareComponent):
         self.name = 'oceanoptics'
         self.settings.New('intg_time', dtype=int, unit='us', initial=3000, vmin=3000)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
+        print("Hello")
 
     def connect(self):
         # Open connection to the device:
@@ -20,7 +21,7 @@ class OceanOpticsHW(HardwareComponent):
 
         #Connect settings to hardware:
         self.settings.intg_time.connect_to_hardware(
-            self.spec.integration_time_micros)
+            self.spec.integration_time_micros(self.settings['intg_time']))
     
         #Take an initial sample of the data.
         self.read_from_hardware()
