@@ -171,13 +171,13 @@ class OceanOpticsMeasure(Measurement):
 
     def _read_spectrometer(self):
         if hasattr(self, 'spec'):
-            intg_time_ms = self.settings['intg_time']
+            intg_time_ms = self.spec.settings['intg_time']
             self.spec.integration_time_micros(intg_time_ms*1e3)
             
             scans_to_avg = self.settings['scans_to_avg']
             Int_array = np.zeros(shape=(2048,scans_to_avg))
             
             for i in range(scans_to_avg): #software average
-                data = self.spec.spectrum(correct_dark_counts=self.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
+                data = self.spec.spectrum(correct_dark_counts=self.spec.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
