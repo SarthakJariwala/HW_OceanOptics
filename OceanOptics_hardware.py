@@ -10,7 +10,7 @@ class OceanOpticsHW(HardwareComponent):
         # Define your hardware settings here.
         # These settings will be displayed in the GUI and auto-saved with data files
         self.name = 'oceanoptics'
-        self.settings.New('intg_time', dtype=int, unit='us', initial=3000, vmin=3000)
+        self.settings.New('intg_time', dtype=int, unit='ms', initial=3000, vmin=3)
         self.settings.New('correct_dark_counts', dtype=bool, initial=True)
         print("Hello")
 
