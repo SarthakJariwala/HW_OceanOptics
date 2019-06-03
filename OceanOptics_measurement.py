@@ -80,7 +80,7 @@ class OceanOpticsMeasure(Measurement):
         """
 
         #self.optimize_plot_line.setData(_read_spectrometer) 
-        try:
+        if hasattr(self, spec):
             self._read_spectrometer()
             save_array[:,1] = self.y
             
@@ -92,8 +92,6 @@ class OceanOpticsMeasure(Measurement):
                            header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
         
             #pg.QtGui.QApplication.processEvents()
-        except:
-            pass
     
     def run(self):
         """
@@ -153,7 +151,7 @@ class OceanOpticsMeasure(Measurement):
                     # Measurement thread. We must periodically check for
                     # an interrupt request
                     break
-                    
+
         finally:            
             if self.settings['save_h5']:
                 # make sure to close the data file
