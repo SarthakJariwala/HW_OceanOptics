@@ -153,7 +153,7 @@ class OceanOpticsMeasure(Measurement):
                     # Measurement thread. We must periodically check for
                     # an interrupt request
                     break
-
+                    
         finally:            
             if self.settings['save_h5']:
                 # make sure to close the data file
