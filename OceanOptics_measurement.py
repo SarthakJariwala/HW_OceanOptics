@@ -11,7 +11,7 @@ class OceanOpticsMeasure(Measurement):
 	
 	# this is the name of the measurement that ScopeFoundry uses 
 	# when displaying your measurement and saving data related to it    
-	name = "oceanoptics_measure"
+	
 	
 	def setup(self):
 		"""
@@ -24,6 +24,7 @@ class OceanOpticsMeasure(Measurement):
 		# This file can be edited graphically with Qt Creator
 		# sibling_path function allows python to find a file in the same folder
 		# as this python module
+		self.name = "oceanoptics_measure"
 		self.ui_filename = sibling_path(__file__, "spec_plot.ui")
 		
 		#Load ui file and convert it to a live QWidget of the user interface
@@ -108,7 +109,7 @@ class OceanOpticsMeasure(Measurement):
 		save_array[:,1] = self.y
 		save_array[:,0] = self.spec.wavelengths()
 
-		np.savetxt(self.settings['save_dir']+"/"+self.settings.sample+".txt", save_array, fmt = '%.5f', 
+		np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+".txt", save_array, fmt = '%.5f', 
 				   header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
 
 	def _read_spectrometer(self):
