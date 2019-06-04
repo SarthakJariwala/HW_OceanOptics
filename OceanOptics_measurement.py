@@ -34,7 +34,7 @@ class OceanOpticsMeasure(Measurement):
 		# This setting allows the option to save data to an h5 data file during a run
 		# All settings are automatically added to the Microscope user interface
 		self.settings.New('save_every_spec', dtype=bool, initial=False)
-		self.settings.New('scans_to_avg', dtype=int, initial=0)
+		self.settings.New('scans_to_avg', dtype=int, initial=1, vmin=1)
 
 		# Define how often to update display during a run
 		self.display_update_period = 0.1 
@@ -64,6 +64,7 @@ class OceanOpticsMeasure(Measurement):
 		self.ui.saveSingle_pushButton.clicked.connect(self.save_single_spec)
 		
 		self.settings.save_every_spec.connect_to_widget(self.ui.save_every_spec_checkBox)
+		self.settings.scans_to_avg.connect_to_widget(self.ui.scans_to_avg_spinBox)
 		self.spec_hw.settings.correct_dark_counts.connect_to_widget(self.ui.correct_dark_counts_checkBox)
 		self.spec_hw.settings.intg_time.connect_to_widget(self.ui.intg_time_spinBox)
 
@@ -86,7 +87,8 @@ class OceanOpticsMeasure(Measurement):
         its update frequency is defined by self.display_update_period
         """
 		if hasattr(self, 'spec'):
-			self.ui.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
+			self.plot.plot(self.spec.wavelengths(), self.y, pen='r', clear=True)
+			pg.QtGui.QApplication.processEvents()
 
 	def run(self):
 		"""
@@ -95,13 +97,17 @@ class OceanOpticsMeasure(Measurement):
 		focus on data acquisition.
 		"""
 		self.spec = self.spec_hw.spec
-		self._read_spectrometer()
-		self.save_array[:,1] = self.y
-		if self.ui.save_every_spec_checkBox.isChecked():
-			self.save_array[:,0] = self.spec.wavelengths()
-			np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+str(self.point_counter)+".txt", self.save_array, fmt = '%.5f', header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
-			self.point_counter += 1
-			pg.QtGui.QApplication.processEvents()
+		while not self.interrupt_measurement_called:
+			self._read_spectrometer()
+			self.save_array[:,1] = self.y
+			if self.ui.save_every_spec_checkBox.isChecked(): #while interrupt not called, inside, have an if for if interrupt is called 
+				self.save_array[:,0] = self.spec.wavelengths()
+				np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+str(self.point_counter)+".txt", self.save_array, fmt = '%.5f', header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
+				self.point_counter += 1
+
+			if self.interrupt_measurement_called:
+				break
+
 
 	def save_single_spec(self):
 		save_array = np.zeros(shape=(2048,2))
