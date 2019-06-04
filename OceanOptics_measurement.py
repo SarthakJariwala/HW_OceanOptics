@@ -104,7 +104,8 @@ class OceanOpticsMeasure(Measurement):
 				self.save_array[:,0] = self.spec.wavelengths()
 				np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+str(self.point_counter)+".txt", self.save_array, fmt = '%.5f', header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
 				self.point_counter += 1
-
+			if self.ui.saveSingle_pushButton.clicked:
+				self.save_single_spec()
 			if self.interrupt_measurement_called:
 				break
 
