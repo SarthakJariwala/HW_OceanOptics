@@ -10,7 +10,7 @@ class OceanOpticsMeasure(Measurement):
     
     # this is the name of the measurement that ScopeFoundry uses 
     # when displaying your measurement and saving data related to it    
-    name = "spec_plot"
+    name = "oceanoptics_measure"
     
     def setup(self):
         """
@@ -49,6 +49,8 @@ class OceanOpticsMeasure(Measurement):
         
         # Convenient reference to the hardware used in the measurement
         ##self.func_gen = self.app.hardware['virtual_function_gen']
+        self.spec_hw = self.app.hardware['oceanoptics']
+        self.spec = self.spec_hw.spec
 
 
     def setup_figure(self):
@@ -82,7 +84,7 @@ class OceanOpticsMeasure(Measurement):
         It should not update the graphical interface directly, and should only
         focus on data acquisition.
         """
-        self.spec = self.app.hardware['oceanoptics'].spec
+        
          # first, create a data file
         if self.settings['save_h5']:
             # if enabled will create an HDF5 file with the plotted data
@@ -171,13 +173,13 @@ class OceanOpticsMeasure(Measurement):
 
     def _read_spectrometer(self):
         if hasattr(self, 'spec'):
-            intg_time_ms = self.spec.settings['intg_time']
+            intg_time_ms = self.spec_hw.settings['intg_time']
             self.spec.integration_time_micros(intg_time_ms*1e3)
             
             scans_to_avg = self.settings['scans_to_avg']
             Int_array = np.zeros(shape=(2048,scans_to_avg))
             
             for i in range(scans_to_avg): #software average
-                data = self.spec.spectrum(correct_dark_counts=self.spec.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
+                data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
                 Int_array[:,i] = data[1]
                 self.y = np.mean(Int_array, axis=-1)
