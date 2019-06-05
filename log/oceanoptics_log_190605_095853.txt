@@ -1,0 +1,15 @@
+2019-06-05T09:58:53|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "microscope_app.py", line 33, in <module>
+    app = OceanOpticsApp(sys.argv)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\base_app.py", line 338, in __init__
+    self.setup()
+  File "microscope_app.py", line 17, in setup
+    self.add_hardware(PiezoStageHW(self))
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\hardware.py", line 81, in __init__
+    self.setup()
+  File "C:\Users\lindat18\Dropbox\Ginger_Lab\HW_OceanOptics\PiezoStage_hardware.py", line 22, in setup
+    self.settings.New('x_pos', dtype=float, unit='um', iniitial=0)
+  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\logged_quantity.py", line 1231, in New
+    lq = LoggedQuantity(name=name, dtype=dtype, **kwargs)
+TypeError: __init__() got an unexpected keyword argument 'iniitial'
+

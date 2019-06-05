@@ -13,12 +13,14 @@ class OceanOpticsApp(BaseMicroscopeApp):
         #Add Hardware components
         from OceanOptics_hardware import OceanOpticsHW
         self.add_hardware(OceanOpticsHW(self))
-        
+        from PiezoStage_hardware import PiezoStageHW
+        self.add_hardware(PiezoStageHW(self))
+
         #Add Measurement components
         from OceanOptics_measurement import OceanOpticsMeasure
-        #from PiezoStage_measurement import PiezoStageMeasure
         self.add_measurement(OceanOpticsMeasure(self))
-        #self.add_measurement(PiezoStageMeasure(self))
+        from PiezoStage_measurement import PiezoStageMeasure
+        self.add_measurement(PiezoStageMeasure(self))
         
         # show ui
         self.ui.show()
