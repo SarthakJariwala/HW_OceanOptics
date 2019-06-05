@@ -106,6 +106,7 @@ class OceanOpticsMeasure(Measurement):
 				self.point_counter += 1
 			if self.ui.saveSingle_pushButton.clicked:
 				self.save_single_spec()
+				self.acq_thread = None
 			if self.interrupt_measurement_called:
 				break
 
