@@ -4,7 +4,7 @@ class OceanOpticsApp(BaseMicroscopeApp):
 
     # this is the name of the microscope that ScopeFoundry uses 
     # when storing data
-    name = 'oceanoptics'
+    name = 'microscope'
     
     # You must define a setup function that adds all the 
     #capablities of the microscope and sets default settings

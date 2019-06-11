@@ -3,9 +3,6 @@ import seabreeze.spectrometers as sb
 
 class OceanOpticsHW(HardwareComponent):
     
-    ## Define name of this hardware plug-in
-
-    
     def setup(self):
         # Define your hardware settings here.
         # These settings will be displayed in the GUI and auto-saved with data files

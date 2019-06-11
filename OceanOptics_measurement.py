@@ -46,7 +46,6 @@ class OceanOpticsMeasure(Measurement):
 		self.point_counter = 0
 		
 		# Convenient reference to the hardware used in the measurement
-		##self.func_gen = self.app.hardware['virtual_function_gen']
 		self.spec_hw = self.app.hardware['oceanoptics']
 
 
@@ -58,7 +57,6 @@ class OceanOpticsMeasure(Measurement):
 		"""
 		
 		# connect ui widgets to measurement/hardware settings or functions
-
 		self.ui.start_pushButton.clicked.connect(self.start)
 		self.ui.interrupt_pushButton.clicked.connect(self.interrupt)
 		self.ui.saveSingle_pushButton.clicked.connect(self.save_single_spec)
@@ -82,7 +80,7 @@ class OceanOpticsMeasure(Measurement):
 
 	def update_display(self):
 		"""
-        Displays (plots) the numpy array self.buffer. 
+        Displays (plots) the wavelengths on x and intensities on y.
         This function runs repeatedly and automatically during the measurement run.
         its update frequency is defined by self.display_update_period
         """
@@ -95,7 +93,10 @@ class OceanOpticsMeasure(Measurement):
 		Runs when measurement is started. Runs in a separate thread from GUI.
 		It should not update the graphical interface directly, and should only
 		focus on data acquisition.
+
+		Runs until measurement is interrupted. Data is continuously saved if checkbox checked.
 		"""
+		self.check_filename()
 		self.spec = self.spec_hw.spec
 		while not self.interrupt_measurement_called:
 			self._read_spectrometer()
@@ -109,22 +110,40 @@ class OceanOpticsMeasure(Measurement):
 
 
 	def save_single_spec(self):
+		'''
+		When button is pushed, save wavelength vs intensity data at that moment.
+		'''
 		save_array = np.zeros(shape=(2048,2))
 		save_array[:,1] = self.y
 		save_array[:,0] = self.spec.wavelengths()
-
+		self.check_filename()
 		np.savetxt(self.app.settings['save_dir']+"/"+self.app.settings['sample']+".txt", save_array, fmt = '%.5f', 
 				   header = 'Wavelength (nm), Intensity (counts)', delimiter = ' ')
 
 	def _read_spectrometer(self):
+		'''
+		Read spectrometer according to settings and update self.y (intensities array)
+		'''
 		if hasattr(self, 'spec'):
 			intg_time_ms = self.spec_hw.settings['intg_time']
-			self.spec.integration_time_micros(intg_time_ms*1e3)
+			self.spec.integration_time_micros(intg_time_ms*1e3) #seabreeze error checking
 			
 			scans_to_avg = self.settings['scans_to_avg']
 			Int_array = np.zeros(shape=(2048,scans_to_avg))
 			
 			for i in range(scans_to_avg): #software average
-				data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts'])#ui.correct_dark_counts_checkBox.isChecked())
+				data = self.spec.spectrum(correct_dark_counts=self.spec_hw.settings['correct_dark_counts']) #data as wavelengths, intensities array   
 				Int_array[:,i] = data[1]
 				self.y = np.mean(Int_array, axis=-1)
+
+
+	def check_filename(self):
+		'''
+		If no sample name given or duplicate sample name given, fix the problem by appending a number.
+		'''
+		filename = self.app.settings['sample']+".txt"
+		directory = self.app.settings['save_dir']
+		number = 1
+		while (os.path.exists(directory+"/"+filename) or self.app.settings['sample'] is ""):
+			filename = self.app.settings['sample'] = filename + str(number)
+			number += 1
