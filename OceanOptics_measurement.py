@@ -6,6 +6,7 @@ from PyQt5 import *
 import numpy as np
 import time
 import seabreeze.spectrometers as sb
+import os.path
 
 class OceanOpticsMeasure(Measurement):
 	
@@ -139,11 +140,12 @@ class OceanOpticsMeasure(Measurement):
 
 	def check_filename(self):
 		'''
-		If no sample name given or duplicate sample name given, fix the problem by appending a number.
+		If no sample name given or duplicate sample name given, fix the problem by appending a unique number.
 		'''
-		filename = self.app.settings['sample']+".txt"
+		samplename = self.app.settings['sample']
+		filename = samplename + "_raw_PL_spectra_data.pkl"
 		directory = self.app.settings['save_dir']
-		number = 1
-		while (os.path.exists(directory+"/"+filename) or self.app.settings['sample'] is ""):
-			filename = self.app.settings['sample'] = filename + str(number)
-			number += 1
+		if samplename == "":
+			self.app.setting['sample'] = int(time.time())
+		if (os.path.exists(directory+"/"+filename):
+			self.app.settings['sample'] = samplename + str(int(time.time()))
