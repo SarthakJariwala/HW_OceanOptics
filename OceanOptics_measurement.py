@@ -146,6 +146,6 @@ class OceanOpticsMeasure(Measurement):
 		filename = samplename + "_raw_PL_spectra_data.pkl"
 		directory = self.app.settings['save_dir']
 		if samplename == "":
-			self.app.setting['sample'] = int(time.time())
+			self.app.settings['sample'] = int(time.time())
 		if (os.path.exists(directory+"/"+filename)):
 			self.app.settings['sample'] = samplename + str(int(time.time()))
