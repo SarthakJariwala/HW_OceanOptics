@@ -27,6 +27,13 @@ class OceanOpticsApp(BaseMicroscopeApp):
         self.ui.show()
         self.ui.activateWindow()
 
+    def on_close(self): #temp fix for properly closing the additional imageview window
+        BaseMicroscopeApp.on_close(self)
+        try:
+            liveupdate = self.measurements["oceanoptics_scan_liveupdate"]
+            liveupdate.imv.close()
+        except:
+            pass
 
 if __name__ == '__main__':
     import sys
