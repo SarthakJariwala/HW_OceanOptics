@@ -1,9 +1,0 @@
-2019-06-04T11:52:08|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
-  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\hardware.py", line 215, in enable_connection
-    raise err
-  File "C:\Users\lindat18\AppData\Local\Continuum\miniconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\hardware.py", line 205, in enable_connection
-    self.connect()
-  File "C:\Users\lindat18\Dropbox\Ginger_Lab\HW_OceanOptics\OceanOptics_hardware.py", line 19, in connect
-    self.spec = sb.Spectrometer(devices[0])
-IndexError: list index out of range
-
